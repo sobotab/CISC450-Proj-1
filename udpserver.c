@@ -9,6 +9,7 @@
 #include <sys/socket.h>     /* for socket, sendto, and recvfrom */
 #include <netinet/in.h>     /* for sockaddr_in */
 #include <unistd.h>         /* for close */
+#include "udp.h"
 
 #define STRING_SIZE 1024
 
@@ -30,8 +31,8 @@ int main(void) {
                                         stores client address */
    unsigned int client_addr_len;  /* Length of client address structure */
 
-   char sentence[STRING_SIZE];  /* receive message */
-   char modifiedSentence[STRING_SIZE]; /* send message */
+   req_packet *req_message;  /* receive message */
+   ret_packet **ret_message; /* return message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
    unsigned int i;  /* temporary loop variable */
@@ -71,7 +72,7 @@ int main(void) {
 
    for (;;) {
 
-      bytes_recd = recvfrom(sock_server, &sentence, STRING_SIZE, 0,
+      bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message), 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
       printf("Received Sentence is: %s\n     with length %d\n\n",
                          sentence, bytes_recd);
