@@ -6,6 +6,8 @@
 #include <netinet/in.h>     /* for sockaddr_in */
 #include <unistd.h>         /* for close */
 
+#include <netdb.h>	    /* for struct hostent and gethostbyname */
+
 #define STRING_SIZE 1024
 
 /* SERV_UDP_PORT is the port number on which the server listens for

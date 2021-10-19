@@ -1,16 +1,4 @@
-/* udp_client.c */ 
-/* Programmed by Adarsh Sethi */
-/* Sept. 19, 2021 */
-
-#include <stdio.h>          /* for standard I/O functions */
-#include <stdlib.h>         /* for exit */
-#include <string.h>         /* for memset, memcpy, and strlen */
-#include <netdb.h>          /* for struct hostent and gethostbyname */
-#include <sys/socket.h>     /* for socket, sendto, and recvfrom */
-#include <netinet/in.h>     /* for sockaddr_in */
-#include <unistd.h>         /* for close */
-
-#define STRING_SIZE 1024
+#include "udp.h"
 
 int main(void) {
 
@@ -27,8 +15,8 @@ int main(void) {
    char server_hostname[STRING_SIZE]; /* Server's hostname */
    unsigned short server_port;  /* Port number used by server (remote port) */
 
-   char sentence[STRING_SIZE];  /* send message */
-   char modifiedSentence[STRING_SIZE]; /* receive message */
+   short unsigned count;  /* send message */
+   ret_packet_t **ret_message; /* receive message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
   
@@ -97,24 +85,25 @@ int main(void) {
    server_addr.sin_port = htons(server_port);
 
    /* user interface */
+   for(;;) {
+   	printf("Please input a sentence:\n");
+   	scanf("%hu", &count);
 
-   printf("Please input a sentence:\n");
-   scanf("%s", sentence);
-   msg_len = strlen(sentence) + 1;
-
-   /* send message */
+   	/* send message */
   
-   bytes_sent = sendto(sock_client, sentence, msg_len, 0,
-            (struct sockaddr *) &server_addr, sizeof (server_addr));
+   	bytes_sent = sendto(sock_client, makeReqPacket(1, count), sizeof(req_packet_t), 0,
+         	   (struct sockaddr *) &server_addr, sizeof (server_addr));
 
-   /* get response from server */
+   	/* get response from server */
+	msg_len=sizeof(ret_packet_t) * count;
+	ret_message=malloc(msg_len);
   
-   printf("Waiting for response from server...\n");
-   bytes_recd = recvfrom(sock_client, modifiedSentence, STRING_SIZE, 0,
-                (struct sockaddr *) 0, (int *) 0);
-   printf("\nThe response from server is:\n");
-   printf("%s\n\n", modifiedSentence);
-
+   	printf("Waiting for response from server...\n");
+   	bytes_recd = recvfrom(sock_client, ret_message, msg_len, 0,
+        	        (struct sockaddr *) 0, (int *) 0);
+   	printf("\nThe response from server is:\n");
+	free(ret_message);
+   }
    /* close the socket */
 
    close (sock_client);

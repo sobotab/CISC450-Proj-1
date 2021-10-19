@@ -1,23 +1,4 @@
-/* udp_server.c */
-/* Programmed by Adarsh Sethi */
-/* Sept. 19, 2021 */
-
-#include <ctype.h>          /* for toupper */
-#include <stdio.h>          /* for standard I/O functions */
-#include <stdlib.h>         /* for exit */
-#include <string.h>         /* for memset */
-#include <sys/socket.h>     /* for socket, sendto, and recvfrom */
-#include <netinet/in.h>     /* for sockaddr_in */
-#include <unistd.h>         /* for close */
 #include "udp.h"
-
-#define STRING_SIZE 1024
-
-/* SERV_UDP_PORT is the port number on which the server listens for
-   incoming messages from clients. You should change this to a different
-   number to prevent conflicts with others in the class. */
-
-#define SERV_UDP_PORT 65129
 
 int main(void) {
 
@@ -75,7 +56,7 @@ int main(void) {
       bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message), 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
       printf("Received Sentence is: %s\n     with length %d\n\n",
-                         sentence, bytes_recd);
+                         "message", bytes_recd);
 
       /* prepare the message to send */
 
@@ -84,7 +65,7 @@ int main(void) {
 
       /* send message */
  
-      bytes_sent = sendto(sock_server, modifiedSentence, ret_message, 0,
+      bytes_sent = sendto(sock_server, ret_message, sizeof(ret_message), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
       free(ret_message);
    }
