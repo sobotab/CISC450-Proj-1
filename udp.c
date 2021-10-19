@@ -1,6 +1,6 @@
 #include "udp.h"
 
-ret_packet_t *makePacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count) {
+ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count) {
 	*ret_packet_t new_packet= malloc(sizeof(ret_packet_t));
 	new_packet->req_id=req_id;
 	new_packet->seq_num=seq_num;
@@ -11,7 +11,7 @@ ret_packet_t *makePacket(unsigned short req_id, unsigned short seq_num, unsigned
 	return new_packet;
 }
 
-ret_packet_t **makeMessage(unsigned short req_id, unsigned short count) {
+ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count) {
 	short remaining_count=count;
 	short count_arg=25;
 	int last=0;

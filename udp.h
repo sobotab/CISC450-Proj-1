@@ -17,7 +17,7 @@
 typedef struct req_packet {
 	unsigned short req_id;
 	unsigned short count;
-}
+} req_packet_t;
 
 typedef struct ret_packet {
 	unsigned short req_id;
@@ -27,5 +27,6 @@ typedef struct ret_packet {
 	unsigned int payload[25];
 } ret_packet_t;
 
-ret_packet_t *makePacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count);
-ret_packet_t **makeMessage(unsigned short req_id);
+ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count);
+ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count);
+req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count);
