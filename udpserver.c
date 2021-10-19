@@ -31,8 +31,8 @@ int main(void) {
                                         stores client address */
    unsigned int client_addr_len;  /* Length of client address structure */
 
-   req_packet *req_message;  /* receive message */
-   ret_packet **ret_message; /* return message */
+   req_packet_t *req_message;  /* receive message */
+   ret_packet_t **ret_message; /* return message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
    unsigned int i;  /* temporary loop variable */
@@ -80,12 +80,12 @@ int main(void) {
       /* prepare the message to send */
 
       msg_len = bytes_recd;
-      for (i=0; i<msg_len; i++)
-         modifiedSentence[i] = toupper (sentence[i]);
+      ret_message=makeRetMessage(req_message->req_id, req_message->count);
 
       /* send message */
  
-      bytes_sent = sendto(sock_server, modifiedSentence, msg_len, 0,
+      bytes_sent = sendto(sock_server, modifiedSentence, ret_message, 0,
                (struct sockaddr*) &client_addr, client_addr_len);
+      free(ret_message);
    }
  }
