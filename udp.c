@@ -1,6 +1,9 @@
 #include "udp.h"
 
 ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count) {
+	/* Desc: assigns values to the struct and returns it. Can have a maximum payload of 25
+	 *
+	 */
 	printf("Beginning makeRetPacket...\n");
 	ret_packet_t *new_packet= malloc(sizeof(ret_packet_t));
 	new_packet->req_id=req_id;
@@ -14,6 +17,9 @@ ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsig
 }
 
 ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count) {
+	/* Creates an array of packets using makeRetPacket
+	 *
+	 */
 	printf("Beginning makeRetMessage...\n");
 	short remaining_count=count;
 	short count_arg=25;
@@ -34,6 +40,9 @@ ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count) {
 }
 
 req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count) {
+	/*
+	 * Assigns values to req_packet_t
+	 */
 	req_packet_t *new_packet=malloc(sizeof(req_packet_t));
 	new_packet->req_id=req_id;
 	new_packet->count=count;

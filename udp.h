@@ -1,3 +1,5 @@
+//Included all packages from base files given by prof
+
 #include <ctype.h>          /* for toupper */
 #include <stdio.h>          /* for standard I/O functions */
 #include <stdlib.h>         /* for exit */
@@ -17,11 +19,13 @@
 #define SERV_UDP_PORT 65129
 
 typedef struct req_packet {
+	//Request packet, requested by client
 	unsigned short req_id;
 	unsigned short count;
 } req_packet_t;
 
 typedef struct ret_packet {
+	//Returned packet, returned by server
 	unsigned short req_id;
 	unsigned short seq_num;
 	unsigned short last;
@@ -29,6 +33,9 @@ typedef struct ret_packet {
 	unsigned int payload[25];
 } ret_packet_t;
 
+//Used by udpserver
 ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count);
 ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count);
+
+//Used by udpclient
 req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count);
