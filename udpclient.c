@@ -92,6 +92,7 @@ int main(void) {
    	/* send message */
   	req_packet_t *req_packet=malloc(sizeof(req_packet));
 	req_packet=makeReqPacket(1,count);
+	convertReq(req_packet, 1);
    	bytes_sent = sendto(sock_client, req_packet, sizeof(req_packet_t), 0,
          	   (struct sockaddr *) &server_addr, sizeof (server_addr));
 
@@ -102,7 +103,8 @@ int main(void) {
    	printf("Waiting for response from server...\n");
    	bytes_recd = recvfrom(sock_client, ret_message, msg_len, 0,
         	        (struct sockaddr *) 0, (int *) 0);
-   	printf("\nThe response from server is:\n");
+	convertRet(ret_message, (int)(count/25+1),0);
+   	printf("\nThe response from server is: %hu\n", ret_message[0]->count);
 	free(ret_message);
    }
    /* close the socket */

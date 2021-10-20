@@ -33,6 +33,9 @@ typedef struct ret_packet {
 	unsigned int payload[25];
 } ret_packet_t;
 
+void convertReq(req_packet_t *request_packet, int network);
+void convertRet(ret_packet_t **return_packet, int length, int network);
+
 //Used by udpserver
 ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count);
 ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count);

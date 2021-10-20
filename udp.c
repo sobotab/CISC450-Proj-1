@@ -50,3 +50,43 @@ req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count) {
 	printf("Leaving makeReqPacket...\n");
 	return new_packet;
 }
+
+void convertReq(req_packet_t *request_packet, int network) {
+	/* Values need to be transmitted to network values so they can be sent
+	 * Network int is used as bool for whether packet should be converted to network values
+	 */
+	if (network) {
+		request_packet->req_id=htons(request_packet->req_id);
+		request_packet->count=htons(request_packet->count);
+	} else {
+		request_packet->req_id=ntohs(request_packet->req_id);
+		request_packet->count=ntohs(request_packet->count);
+	}
+}
+
+void convertRet(ret_packet_t **return_packet, int length, int network) {
+	/* Values need to be converted to network values so they can be sent
+	 * Network int is a bool
+	 */
+	if (network) {
+		for (int i=0; i < length; i++) {
+			return_packet[i]->req_id=htons(return_packet[i]->req_id);
+			return_packet[i]->seq_num=htons(return_packet[i]->seq_num);
+			return_packet[i]->last=htons(return_packet[i]->last);
+			return_packet[i]->count=htons(return_packet[i]->count);
+			for(int j=0; return_packet[i]->payload[j] && j<25; j++) {
+				return_packet[i]->payload[j]=htonl(return_packet[i]->payload[j]);
+			}
+		}
+	} else {
+		for (int i=0; i < length; i++) {
+                        return_packet[i]->req_id=ntohs(return_packet[i]->req_id);
+                        return_packet[i]->seq_num=ntohs(return_packet[i]->seq_num);
+                        return_packet[i]->last=ntohs(return_packet[i]->last);
+                        return_packet[i]->count=ntohs(return_packet[i]->count);
+                        for(int j=0; return_packet[i]->payload[j] && j<25; j++) {
+                                return_packet[i]->payload[j]=ntohl(return_packet[i]->payload[j]);
+                        }
+                }
+	}
+}

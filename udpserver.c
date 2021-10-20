@@ -53,22 +53,22 @@ int main(void) {
 
    for (;;) {
 
-      bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message), 0,
+      bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message)*10, 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
+      convertReq(req_message, 0);
       printf("Received Sentence is: %s\n     with length %d\n\n",
                          "message", bytes_recd);
 
       /* prepare the message to send */
 
       msg_len = bytes_recd;
-      req_message=(req_packet_t)req_message;
-      printf("before mallocing space for ret_message: %hu\n", req_message->count);
       ret_message=malloc((req_message->count/25+1)*sizeof(ret_packet_t));
       printf("after mallocing space for ret_message\n");
       ret_message=makeRetMessage(req_message->req_id, req_message->count);
 
       /* send message */
  	printf("before bytes sent\n");
+      convertRet(ret_message, (int)(req_message->count/25+1), 1);
       bytes_sent = sendto(sock_server, ret_message, sizeof(ret_message), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
    	printf("after bytes sent\n");
