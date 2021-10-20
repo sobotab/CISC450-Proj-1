@@ -90,8 +90,9 @@ int main(void) {
    	scanf("%hu", &count);
 
    	/* send message */
-  
-   	bytes_sent = sendto(sock_client, makeReqPacket(1, count), sizeof(req_packet_t), 0,
+  	req_packet_t *req_packet=malloc(sizeof(req_packet));
+	req_packet=makeReqPacket(1,count);
+   	bytes_sent = sendto(sock_client, req_packet, sizeof(req_packet_t), 0,
          	   (struct sockaddr *) &server_addr, sizeof (server_addr));
 
    	/* get response from server */

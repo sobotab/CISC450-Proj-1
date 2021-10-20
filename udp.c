@@ -43,8 +43,10 @@ req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count) {
 	/*
 	 * Assigns values to req_packet_t
 	 */
+	printf("Beginnging makeReqPacket...\n");
 	req_packet_t *new_packet=malloc(sizeof(req_packet_t));
 	new_packet->req_id=req_id;
 	new_packet->count=count;
+	printf("Leaving makeReqPacket...\n");
 	return new_packet;
 }

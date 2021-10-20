@@ -12,7 +12,7 @@ int main(void) {
                                         stores client address */
    unsigned int client_addr_len;  /* Length of client address structure */
 
-   req_packet_t *req_message;  /* receive message */
+   req_packet_t *req_message=malloc(sizeof(req_packet_t));  /* receive message */
    ret_packet_t **ret_message; /* return message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
@@ -61,12 +61,16 @@ int main(void) {
       /* prepare the message to send */
 
       msg_len = bytes_recd;
+      req_message=(req_packet_t)req_message;
+      printf("before mallocing space for ret_message: %hu\n", req_message->count);
+      ret_message=malloc((req_message->count/25+1)*sizeof(ret_packet_t));
+      printf("after mallocing space for ret_message\n");
       ret_message=makeRetMessage(req_message->req_id, req_message->count);
 
       /* send message */
- 
+ 	printf("before bytes sent\n");
       bytes_sent = sendto(sock_server, ret_message, sizeof(ret_message), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
-      free(ret_message);
+   	printf("after bytes sent\n");
    }
  }
