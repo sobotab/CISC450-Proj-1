@@ -53,10 +53,9 @@ int main(void) {
 
    for (;;) {
 
-      bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message)+1, 0,
+      bytes_recd = recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
       printf("Before convert req_message\n");
-      printf("req_id: %hu\n", req_message->req_id);
       convertReq(req_message, 0);
       printf("Received Sentence is: %s\n     with length %d\n\n",
                          "message", bytes_recd);

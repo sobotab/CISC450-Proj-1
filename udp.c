@@ -55,6 +55,7 @@ void convertReq(req_packet_t *request_packet, int network) {
 	/* Values need to be transmitted to network values so they can be sent
 	 * Network int is used as bool for whether packet should be converted to network values
 	 */
+	printf("Beginning convertReq...\n");
 	if (network) {
 		request_packet->req_id=htons(request_packet->req_id);
 		request_packet->count=htons(request_packet->count);
@@ -62,12 +63,14 @@ void convertReq(req_packet_t *request_packet, int network) {
 		request_packet->req_id=ntohs(request_packet->req_id);
 		request_packet->count=ntohs(request_packet->count);
 	}
+	printf("Leaving convertReq...\n");
 }
 
 void convertRet(ret_packet_t **return_packet, int length, int network) {
 	/* Values need to be converted to network values so they can be sent
 	 * Network int is a bool
 	 */
+	printf("Beginning convertRet...\n");
 	if (network) {
 		for (int i=0; i < length; i++) {
 			return_packet[i]->req_id=htons(return_packet[i]->req_id);
@@ -89,4 +92,5 @@ void convertRet(ret_packet_t **return_packet, int length, int network) {
                         }
                 }
 	}
+	printf("Leaving convertRet...\n");
 }
