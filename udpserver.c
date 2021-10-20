@@ -12,7 +12,7 @@ int main(void) {
                                         stores client address */
    unsigned int client_addr_len;  /* Length of client address structure */
 
-   req_packet_t *req_message=malloc(sizeof(req_packet_t));  /* receive message */
+   req_packet_t *req_message=(req_packet_t*)malloc(sizeof(req_packet_t)+1);  /* receive message */
    ret_packet_t **ret_message; /* return message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
@@ -53,8 +53,10 @@ int main(void) {
 
    for (;;) {
 
-      bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message)*10, 0,
+      bytes_recd = recvfrom(sock_server, &req_message, sizeof(req_message)+1, 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
+      printf("Before convert req_message\n");
+      printf("req_id: %hu\n", req_message->req_id);
       convertReq(req_message, 0);
       printf("Received Sentence is: %s\n     with length %d\n\n",
                          "message", bytes_recd);
