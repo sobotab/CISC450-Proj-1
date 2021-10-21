@@ -73,7 +73,7 @@ int main(void) {
       makeRetMessage(ret_message, req_message->req_id, req_message->count);
 
       /* send message */
-      printf("count from ret_message[0]: %hu\n", ret_message[1]->count);
+
       convertRet(ret_message, (int)(req_message->count/25+1), 1);
       ret_packet_t ret_message_cpy[sizeof(req_message->count/25+1)];
       for (int i=0; i<(req_message->count/25+1); i++) {
