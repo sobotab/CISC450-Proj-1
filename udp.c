@@ -5,7 +5,7 @@ void makeRetPacket(ret_packet_t *new_packet, unsigned short req_id,
 	/* Desc: assigns values to the struct and returns it. Can have a maximum payload of 25
 	 *
 	 */
-	printf("Beginning makeRetPacket...\n");
+	//printf("Beginning makeRetPacket...\n");
 	new_packet->req_id=req_id;
 	new_packet->seq_num=seq_num;
 	new_packet->last=last;
@@ -13,7 +13,7 @@ void makeRetPacket(ret_packet_t *new_packet, unsigned short req_id,
 	for (int i=0; i<count; i++) {
 		new_packet->payload[i]=rand()%65536;
 	}
-	printf("Leaving makeRetPacket...\n");
+	//printf("Leaving makeRetPacket...\n");
 }
 
 void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsigned short count) {

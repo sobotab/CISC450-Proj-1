@@ -20,7 +20,9 @@ int main(void) {
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
    int total_bytes_received=0;
-  
+   unsigned short num_packets=0;
+   unsigned short sum_sequence=0;
+   unsigned int checksum=0;
    /* open a socket */
 
    if ((sock_client = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
@@ -99,13 +101,36 @@ int main(void) {
    	/* get response from server */
 	msg_len=sizeof(ret_packet_t) * count;
 	
-   /* close the socket */
-   for (unsigned int i=1; i<count/25; i++) {
-      bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
+	/*ret_message=(ret_packet_t *)malloc(sizeof(ret_packet_t)*(count/25+1));
+  
+   	printf("Waiting for response from server...\n");
+   	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*sizeof(ret_packet_t), 0,
         	        (struct sockaddr *) 0, (int *) 0);
-      total_bytes_received=total_bytes_received+bytes_recd;
+	convertRetNonNetwork(ret_message, count/25+1, 0);
+   	printf("Made it here?\n");
+	printf("\nThe response from server is: %hu\n", ret_message[0].count);
+	free(ret_message);
    }
-   if(count%25!=0){
+   /* close the socket */
+   bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
+        	        (struct sockaddr *) 0, (int *) 0);
+   total_bytes_received=total_bytes_received+bytes_recd;
+   sum_sequence=sum_sequence+ret_message->seq_num;
+   num_packets=num_packets+1;
+   for(int arr=0;arr<25;arr++){
+           checksum=checksum+ret_message->payload[arr];
+   }
+   while(ret_message->last!=1){
+     bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
+                        (struct sockaddr *) 0, (int *) 0);
+     total_bytes_received=total_bytes_received+bytes_recd;
+     sum_sequence=sum_sequence+ret_message->seq_num;
+     num_packets=num_packets+1;
+     for(int arr=0;arr<ret_message->count;arr++){
+           checksum=checksum+ret_message->payload[arr];
+     }
+   }
+   /* if(count%25!=0){
      bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
                         (struct sockaddr *) 0, (int *) 0);
      total_bytes_received=total_bytes_received+bytes_recd;
@@ -117,8 +142,11 @@ int main(void) {
      bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
 			(struct sockaddr *) 0, (int *) 0);
      total_bytes_received=total_bytes_received+bytes_recd;
-   }
+     }*/
+   printf("Number of Packets Received: %d\n",num_packets);
    printf("Total Bytes Received: %d\n",total_bytes_received);
+   printf("Sequence Number Checksum: %d\n",sum_sequence);
+   printf("Payload Checksum: %d\n",checksum);
    close (sock_client);
 }
 }
