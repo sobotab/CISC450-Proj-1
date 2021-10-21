@@ -13,9 +13,11 @@ int main(void) {
    unsigned int client_addr_len;  /* Length of client address structure */
 
    req_packet_t *req_message=(req_packet_t*)malloc(sizeof(req_packet_t)+1);  /* receive message */
-   ret_packet_t **ret_message; /* return message */
+   ret_packet_t *ret_message=(ret_packet_t*)malloc(sizeof(ret_packet_t)); /* return message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
+   bytes_recd=0;
+   int total_bytes_sent=0;
    unsigned int i;  /* temporary loop variable */
 
    /* open a socket */
@@ -52,10 +54,11 @@ int main(void) {
    client_addr_len = sizeof (client_addr);
 
    for (;;) {
-
-      bytes_recd = recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
+     while(bytes_recd==0){
+       bytes_recd = recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
-      printf("Before convert req_message\n");
+     }
+       printf("Before convert req_message\n");
       convertReq(req_message, 0);
       printf("Received Sentence is: %s\n     with length %d\n\n",
                          "message", bytes_recd);
@@ -63,24 +66,32 @@ int main(void) {
       /* prepare the message to send */
 
       msg_len = bytes_recd;
-      ret_message=(ret_packet_t**)calloc(req_message->count/25+1, sizeof(ret_packet_t));
-      
-      for (int i=0; i<req_message->count/25+1; i++) {
-	      ret_message[i]=(ret_packet_t*)malloc(sizeof(ret_packet_t));
-      }
-
-      printf("after mallocing space for ret_message\n");
-      makeRetMessage(ret_message, req_message->req_id, req_message->count);
-
-      /* send message */
-
-      convertRet(ret_message, (int)(req_message->count/25+1), 1);
-      ret_packet_t ret_message_cpy[sizeof(req_message->count/25+1)];
-      for (int i=0; i<(req_message->count/25+1); i++) {
-	      ret_message_cpy[i]=*ret_message[i];
-      }
-      bytes_sent = sendto(sock_server, ret_message_cpy, sizeof(ret_message), 0,
+      bytes_recd=0;
+      //For each packet except the final, make a return packet and send it out. Increment bytes
+      for (i=1; i<req_message->count/25; i++) {
+	      makeRetPacket(ret_message,req_message->req_id,i,0,25);
+         bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
-   	printf("after bytes sent\n");
+         total_bytes_sent=total_bytes_sent+bytes_sent;
+      }
+      //If last packet is not full payload, send final full payload and then final packet with lesser payload
+      if(req_message->count%25!=0){
+	      makeRetPacket(ret_message,req_message->req_id,i,0,25);
+         bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t), 0,
+               (struct sockaddr*) &client_addr, client_addr_len);
+         total_bytes_sent=total_bytes_sent+bytes_sent;
+	      makeRetPacket(ret_message,req_message->req_id,i,1,req_message->count%25);
+	      bytes_sent = sendto(sock_server, ret_message, 8+4*(req_message->count%25), 0,
+               (struct sockaddr*) &client_addr, client_addr_len);
+	      total_bytes_sent=total_bytes_sent+bytes_sent;
+      }
+      //Else send last packet since it has full payload.
+      else{
+	      makeRetPacket(ret_message,req_message->req_id,i,1,25);
+         bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t), 0,
+               (struct sockaddr*) &client_addr, client_addr_len);
+         total_bytes_sent=total_bytes_sent+bytes_sent;
+      }
+      printf("Total Bytes Sent: %d\n",total_bytes_sent);
    }
  }

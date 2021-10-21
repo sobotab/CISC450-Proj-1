@@ -16,9 +16,10 @@ int main(void) {
    unsigned short server_port;  /* Port number used by server (remote port) */
 
    short unsigned count;  /* send message */
-   ret_packet_t *ret_message; /* receive message */
+   ret_packet_t *ret_message=(ret_packet_t*)malloc(sizeof(ret_packet_t)); /* receive message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
+   int total_bytes_received=0;
   
    /* open a socket */
 
@@ -98,17 +99,26 @@ int main(void) {
    	/* get response from server */
 	msg_len=sizeof(ret_packet_t) * count;
 	
-	ret_message=(ret_packet_t *)malloc(sizeof(ret_packet_t)*(count/25+1));
-  
-   	printf("Waiting for response from server...\n");
-   	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*sizeof(ret_packet_t), 0,
-        	        (struct sockaddr *) 0, (int *) 0);
-	convertRetNonNetwork(ret_message, count/25+1, 0);
-   	printf("Made it here?\n");
-	printf("\nThe response from server is: %hu\n", ret_message[0].count);
-	free(ret_message);
-   }
    /* close the socket */
-
+   for (unsigned int i=1; i<count/25; i++) {
+      bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
+        	        (struct sockaddr *) 0, (int *) 0);
+      total_bytes_received=total_bytes_received+bytes_recd;
+   }
+   if(count%25!=0){
+     bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
+                        (struct sockaddr *) 0, (int *) 0);
+     total_bytes_received=total_bytes_received+bytes_recd;
+     bytes_recd = recvfrom(sock_client, ret_message, 8+4*(count%25), 0,
+        	        (struct sockaddr *) 0, (int *) 0);
+     total_bytes_received=total_bytes_received+bytes_recd;
+   }
+   else{
+     bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t), 0,
+			(struct sockaddr *) 0, (int *) 0);
+     total_bytes_received=total_bytes_received+bytes_recd;
+   }
+   printf("Total Bytes Received: %d\n",total_bytes_received);
    close (sock_client);
+}
 }
