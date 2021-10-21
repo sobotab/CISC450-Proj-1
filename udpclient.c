@@ -107,13 +107,13 @@ int main(void) {
                 printf("i: %d, randint: %ld\n", i, ret_message[0].payload[i]);
         }
 
-	convertRetNonNetwork(ret_message, count/25+1, 0);
+	convertRet(ret_message, count/25+1, 0);
    	printf("Made it here?\n");
 	
 	for (int i=0; i<25; i++) {
 		printf("i: %d, randint: %ld\n", i, ret_message[0].payload[i]);
 	}
-	printf("seq_num: %hu, req_id: %hu, count: %hu: last: %hu", ret_message[0].seq_num, ret_message[0].req_id, ret_message[0].count, ret_message[0].last);
+	printf("seq_num: %hu, req_id: %hu, count: %hu: last: %hu\n", ret_message[0].seq_num, ret_message[0].req_id, ret_message[0].count, ret_message[0].last);
 
 
 	free(ret_message);
