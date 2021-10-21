@@ -1,7 +1,11 @@
 #include "udp.h"
 
-int main(void) {
 
+int main(void) {
+   
+   time_t t;
+   srand((unsigned) time(&t));
+   
    int sock_server;  /* Socket on which server listens to clients */
 
    struct sockaddr_in server_addr;  /* Internet address structure that
@@ -75,10 +79,17 @@ int main(void) {
       /* send message */
 
       convertRet(ret_message, (int)(req_message->count/25+1), 1);
+
       ret_packet_t ret_message_cpy[sizeof(req_message->count/25+1)];
       for (int i=0; i<(req_message->count/25+1); i++) {
 	      ret_message_cpy[i]=*ret_message[i];
       }
+
+      for (int i=0; i< 25; i++) {
+              printf("i: %d, randint: %d\n", i, ret_message_cpy[0].payload[i]);
+      }
+
+
       bytes_sent = sendto(sock_server, ret_message_cpy, sizeof(ret_message), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
    	printf("after bytes sent\n");

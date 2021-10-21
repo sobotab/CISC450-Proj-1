@@ -105,7 +105,11 @@ int main(void) {
         	        (struct sockaddr *) 0, (int *) 0);
 	convertRetNonNetwork(ret_message, count/25+1, 0);
    	printf("Made it here?\n");
-	printf("\nThe response from server is: %hu\n", ret_message[0].count);
+	
+	for (int i=0; i<25; i++) {
+		printf("i: %d, randint: %d\n", i, ret_message[0].payload[i]);
+	}
+
 	free(ret_message);
    }
    /* close the socket */

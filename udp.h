@@ -7,7 +7,7 @@
 #include <sys/socket.h>     /* for socket, sendto, and recvfrom */
 #include <netinet/in.h>     /* for sockaddr_in */
 #include <unistd.h>         /* for close */
-
+#include <time.h>
 #include <netdb.h>	    /* for struct hostent and gethostbyname */
 
 #define STRING_SIZE 1024
