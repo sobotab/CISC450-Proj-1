@@ -38,7 +38,7 @@ void convertRet(ret_packet_t **return_packet, int length, int network);
 
 //Used by udpserver
 ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count);
-ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count);
+void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsigned short count);
 
 //Used by udpclient
 req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count);

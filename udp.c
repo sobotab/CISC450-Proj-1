@@ -9,14 +9,16 @@ ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsig
 	new_packet->req_id=req_id;
 	new_packet->seq_num=seq_num;
 	new_packet->last=last;
+	new_packet->count=count;
 	for (int i=0; i<count; i++) {
 		new_packet->payload[i]=rand()%65536;
 	}
+	printf("count: %hu\n", new_packet->count);
 	printf("Leaving makeRetPacket...\n");
 	return new_packet;
 }
 
-ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count) {
+void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsigned short count) {
 	/* Creates an array of packets using makeRetPacket
 	 *
 	 */
@@ -25,7 +27,6 @@ ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count) {
 	short count_arg=25;
 	int last=0;
 	int i=1;
-	ret_packet_t **new_message=malloc(sizeof(ret_packet_t)*(count/25+1));
 	while (!last && remaining_count) {
 		if(remaining_count > 25) {
 			remaining_count=remaining_count-count_arg;
@@ -33,10 +34,10 @@ ret_packet_t **makeRetMessage(unsigned short req_id, unsigned short count) {
 			last = 1;
 			count_arg=remaining_count;
 		}
-		makeRetPacket(req_id, i++, last, count_arg);
+		return_message[i]=makeRetPacket(req_id, i++, last, count_arg);
 	}
+	printf("Count of first packet in message: %hu\n", return_message[i]->count);
 	printf("Leaving makeRetMessage...\n");
-	return new_message;
 }
 
 req_packet_t *makeReqPacket(unsigned short req_id, unsigned short count) {
@@ -73,22 +74,27 @@ void convertRet(ret_packet_t **return_packet, int length, int network) {
 	printf("Beginning convertRet...\n");
 	if (network) {
 		for (int i=0; i < length; i++) {
+			printf("converRet loop packet: %d\n", i);
 			return_packet[i]->req_id=htons(return_packet[i]->req_id);
+			printf("doesn't make it here\n");
 			return_packet[i]->seq_num=htons(return_packet[i]->seq_num);
 			return_packet[i]->last=htons(return_packet[i]->last);
 			return_packet[i]->count=htons(return_packet[i]->count);
 			for(int j=0; return_packet[i]->payload[j] && j<25; j++) {
+				printf("convertRet loop payload: %d\n", j);
 				return_packet[i]->payload[j]=htonl(return_packet[i]->payload[j]);
 			}
 		}
 	} else {
 		for (int i=0; i < length; i++) {
+			printf("convertRet loop packet: %d\n", i);
                         return_packet[i]->req_id=ntohs(return_packet[i]->req_id);
                         return_packet[i]->seq_num=ntohs(return_packet[i]->seq_num);
                         return_packet[i]->last=ntohs(return_packet[i]->last);
                         return_packet[i]->count=ntohs(return_packet[i]->count);
                         for(int j=0; return_packet[i]->payload[j] && j<25; j++) {
-                                return_packet[i]->payload[j]=ntohl(return_packet[i]->payload[j]);
+                                printf("convertRet loop payload: %d\n", j);
+				return_packet[i]->payload[j]=ntohl(return_packet[i]->payload[j]);
                         }
                 }
 	}

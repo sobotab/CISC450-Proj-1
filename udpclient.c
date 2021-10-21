@@ -95,16 +95,21 @@ int main(void) {
 	convertReq(req_packet, 1);
    	bytes_sent = sendto(sock_client, req_packet, sizeof(req_packet_t), 0,
          	   (struct sockaddr *) &server_addr, sizeof (server_addr));
-
    	/* get response from server */
 	msg_len=sizeof(ret_packet_t) * count;
-	ret_message=malloc(msg_len);
+	
+	ret_message=(ret_packet_t **)malloc(sizeof(ret_packet_t)*(count/25+1)+1);
+	for (int i=0; i<(count/25+1); i++) {
+		printf("making space for ret_message: %d\n", i);
+		ret_message[i]=(ret_packet_t *)malloc(sizeof(ret_packet_t)+1);
+	}
   
    	printf("Waiting for response from server...\n");
    	bytes_recd = recvfrom(sock_client, ret_message, msg_len, 0,
         	        (struct sockaddr *) 0, (int *) 0);
-	convertRet(ret_message, (int)(count/25+1),0);
-   	printf("\nThe response from server is: %hu\n", ret_message[0]->count);
+	convertRet(ret_message, (int)(count/25+1), 0);
+   	printf("Made it here?\n");
+	printf("\nThe response from server is: %hu\n", ret_message[0]->count);
 	free(ret_message);
    }
    /* close the socket */
