@@ -69,7 +69,6 @@ int main(void) {
 
       msg_len = bytes_recd;
       bytes_recd=0;
-      printf("%d",bytes_recd);
       for (i=1; i<req_message->count/25; i++) {
 	 makeRetPacket(ret_message,req_message->req_id,i,0,25);
 	 sum_sequence=sum_sequence+ret_message->seq_num;
