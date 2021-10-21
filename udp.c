@@ -1,11 +1,11 @@
 #include "udp.h"
 
-ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsigned short last, unsigned short count) {
+void makeRetPacket(ret_packet_t *new_packet, unsigned short req_id, 
+		unsigned short seq_num, unsigned short last, unsigned short count) {
 	/* Desc: assigns values to the struct and returns it. Can have a maximum payload of 25
 	 *
 	 */
 	printf("Beginning makeRetPacket...\n");
-	ret_packet_t *new_packet= malloc(sizeof(ret_packet_t));
 	new_packet->req_id=req_id;
 	new_packet->seq_num=seq_num;
 	new_packet->last=last;
@@ -13,9 +13,7 @@ ret_packet_t *makeRetPacket(unsigned short req_id, unsigned short seq_num, unsig
 	for (int i=0; i<count; i++) {
 		new_packet->payload[i]=rand()%65536;
 	}
-	printf("count: %hu\n", new_packet->count);
 	printf("Leaving makeRetPacket...\n");
-	return new_packet;
 }
 
 void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsigned short count) {
@@ -26,7 +24,7 @@ void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsign
 	short remaining_count=count;
 	short count_arg=25;
 	int last=0;
-	int i=1;
+	int i=0;
 	while (!last && remaining_count) {
 		if(remaining_count > 25) {
 			remaining_count=remaining_count-count_arg;
@@ -34,9 +32,8 @@ void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsign
 			last = 1;
 			count_arg=remaining_count;
 		}
-		return_message[i]=makeRetPacket(req_id, i++, last, count_arg);
+		makeRetPacket(return_message[i], req_id, i, last, count_arg);
 	}
-	printf("Count of first packet in message: %hu\n", return_message[i]->count);
 	printf("Leaving makeRetMessage...\n");
 }
 
@@ -74,14 +71,11 @@ void convertRet(ret_packet_t **return_packet, int length, int network) {
 	printf("Beginning convertRet...\n");
 	if (network) {
 		for (int i=0; i < length; i++) {
-			printf("converRet loop packet: %d\n", i);
 			return_packet[i]->req_id=htons(return_packet[i]->req_id);
-			printf("doesn't make it here\n");
 			return_packet[i]->seq_num=htons(return_packet[i]->seq_num);
 			return_packet[i]->last=htons(return_packet[i]->last);
 			return_packet[i]->count=htons(return_packet[i]->count);
 			for(int j=0; return_packet[i]->payload[j] && j<25; j++) {
-				printf("convertRet loop payload: %d\n", j);
 				return_packet[i]->payload[j]=htonl(return_packet[i]->payload[j]);
 			}
 		}

@@ -63,19 +63,17 @@ int main(void) {
       /* prepare the message to send */
 
       msg_len = bytes_recd;
-      ret_message=(ret_packet_t**)malloc(sizeof(ret_packet_t)*(req_message->count/25+1)+1);
+      ret_message=(ret_packet_t**)calloc(req_message->count/25+1, sizeof(ret_packet_t));
+      
+      for (int i=0; i<req_message->count/25+1; i++) {
+	      ret_message[i]=(ret_packet_t*)malloc(sizeof(ret_packet_t));
+      }
 
       printf("after mallocing space for ret_message\n");
       makeRetMessage(ret_message, req_message->req_id, req_message->count);
 
       /* send message */
- 	printf("before bytes sent\n");
-	printf("way before sending: %hu\n", ret_message[0]->count);
       convertRet(ret_message, (int)(req_message->count/25+1), 1);
-      convertRet(ret_message, (int)(req_message->count/25+1), 0);
-      printf("bytes before conversion: %hu\n", ret_message[0]->count);
-      convertRet(ret_message, (int)(req_message->count/25+1), 1);
-      printf("bytes after converstion: %hu\n", ret_message[0]->count);
       bytes_sent = sendto(sock_server, ret_message, sizeof(ret_message), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
    	printf("after bytes sent\n");
