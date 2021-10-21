@@ -16,7 +16,7 @@ int main(void) {
    unsigned short server_port;  /* Port number used by server (remote port) */
 
    short unsigned count;  /* send message */
-   ret_packet_t **ret_message; /* receive message */
+   ret_packet_t *ret_message; /* receive message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
   
@@ -98,18 +98,14 @@ int main(void) {
    	/* get response from server */
 	msg_len=sizeof(ret_packet_t) * count;
 	
-	ret_message=(ret_packet_t **)malloc(sizeof(ret_packet_t)*(count/25+1));
-	for (int i=0; i<(count/25+1); i++) {
-		ret_message[i]=(ret_packet_t*)malloc(sizeof(ret_packet_t));
-	}
+	ret_message=(ret_packet_t *)malloc(sizeof(ret_packet_t)*(count/25+1));
   
    	printf("Waiting for response from server...\n");
    	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*sizeof(ret_packet_t), 0,
         	        (struct sockaddr *) 0, (int *) 0);
-	printf("ret_message something: %hu\n", ret_message[0]->count);
-	convertRet(ret_message, count/25+1, 0);
+	convertRetNonNetwork(ret_message, count/25+1, 0);
    	printf("Made it here?\n");
-	printf("\nThe response from server is: %hu\n", ret_message[0]->count);
+	printf("\nThe response from server is: %hu\n", ret_message[0].count);
 	free(ret_message);
    }
    /* close the socket */

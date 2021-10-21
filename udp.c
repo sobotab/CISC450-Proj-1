@@ -27,12 +27,16 @@ void makeRetMessage(ret_packet_t** return_message, unsigned short req_id, unsign
 	int i=0;
 	while (!last && remaining_count) {
 		if(remaining_count > 25) {
+			printf("making packet of size 25\n");
 			remaining_count=remaining_count-count_arg;
 		} else {
+			printf("making packet of size <25\n");
 			last = 1;
 			count_arg=remaining_count;
 		}
 		makeRetPacket(return_message[i], req_id, i, last, count_arg);
+		printf("packet %d count: %hu\n", i, return_message[i]->count);
+		i++;
 	}
 	printf("Leaving makeRetMessage...\n");
 }
@@ -93,4 +97,18 @@ void convertRet(ret_packet_t **return_packet, int length, int network) {
                 }
 	}
 	printf("Leaving convertRet...\n");
+}
+
+void convertRetNonNetwork(ret_packet_t *return_packet, int length, int network) {
+	for (int i=0; i < length; i++) {
+	        printf("convertRet loop packet: %d\n", i);
+                return_packet[i].req_id=ntohs(return_packet[i].req_id);
+                return_packet[i].seq_num=ntohs(return_packet[i].seq_num);
+                return_packet[i].last=ntohs(return_packet[i].last);
+                return_packet[i].count=ntohs(return_packet[i].count);
+                for(int j=0; return_packet[i].payload[j] && j<25; j++) {
+                       printf("convertRet loop payload: %d\n", j);
+                       return_packet[i].payload[j]=ntohl(return_packet[i].payload[j]);
+                }
+        }
 }

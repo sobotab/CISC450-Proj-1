@@ -35,6 +35,7 @@ typedef struct ret_packet {
 
 void convertReq(req_packet_t *request_packet, int network);
 void convertRet(ret_packet_t **return_packet, int length, int network);
+void convertRetNonNetwork(ret_packet_t *return_packet, int length, int network);
 
 //Used by udpserver
 void makeRetPacket(ret_packet_t *new_packet, unsigned short req_id, 
