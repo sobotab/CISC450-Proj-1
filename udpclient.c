@@ -102,13 +102,19 @@ int main(void) {
   
    	printf("Waiting for response from server...\n");
    	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*sizeof(ret_packet_t), 0,
-        	        (struct sockaddr *) 0, (int *) 0);
+       		(struct sockaddr *) 0, (int *) 0); 
+	for (int i=0; i<25; i++) {
+                printf("i: %d, randint: %ld\n", i, ret_message[0].payload[i]);
+        }
+
 	convertRetNonNetwork(ret_message, count/25+1, 0);
    	printf("Made it here?\n");
 	
 	for (int i=0; i<25; i++) {
-		printf("i: %d, randint: %d\n", i, ret_message[0].payload[i]);
+		printf("i: %d, randint: %ld\n", i, ret_message[0].payload[i]);
 	}
+	printf("seq_num: %hu, req_id: %hu, count: %hu: last: %hu", ret_message[0].seq_num, ret_message[0].req_id, ret_message[0].count, ret_message[0].last);
+
 
 	free(ret_message);
    }

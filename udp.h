@@ -16,21 +16,21 @@
    incoming messages from clients. You should change this to a different
    number to prevent conflicts with others in the class. */
 
-#define SERV_UDP_PORT 65129
+#define SERV_UDP_PORT 65130
 
 typedef struct req_packet {
 	//Request packet, requested by client
-	unsigned short req_id;
-	unsigned short count;
+	unsigned short int req_id;
+	unsigned short int count;
 } req_packet_t;
 
 typedef struct ret_packet {
 	//Returned packet, returned by server
-	unsigned short req_id;
-	unsigned short seq_num;
-	unsigned short last;
-	unsigned short count;
-	unsigned int payload[25];
+	unsigned short int req_id;
+	unsigned short int seq_num;
+	unsigned short int last;
+	unsigned short int count;
+	unsigned long int payload[25];
 } ret_packet_t;
 
 void convertReq(req_packet_t *request_packet, int network);

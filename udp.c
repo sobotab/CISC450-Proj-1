@@ -79,7 +79,7 @@ void convertRet(ret_packet_t **return_packet, int length, int network) {
 			return_packet[i]->seq_num=htons(return_packet[i]->seq_num);
 			return_packet[i]->last=htons(return_packet[i]->last);
 			return_packet[i]->count=htons(return_packet[i]->count);
-			for(int j=0; return_packet[i]->payload[j] && j<25; j++) {
+			for(int j=0; j<25; j++) {
 				return_packet[i]->payload[j]=htonl(return_packet[i]->payload[j]);
 			}
 		}
@@ -107,9 +107,7 @@ void convertRetNonNetwork(ret_packet_t *return_packet, int length, int network) 
                 return_packet[i].last=ntohs(return_packet[i].last);
                 return_packet[i].count=ntohs(return_packet[i].count);
                 for(int j=0; j<25; j++) {
-                       printf("convertRet loop payload: %d\n", j);
-		       printf("return packet[%d].payload[%d]=%d",i,j,return_packet[i].payload[j]);
-                       return_packet[i].payload[j]=ntohl(return_packet[i].payload[j]);
+			return_packet[i].payload[j]=ntohl(return_packet[i].payload[j]);
                 }
         }
 }

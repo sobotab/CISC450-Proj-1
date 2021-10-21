@@ -77,18 +77,17 @@ int main(void) {
       makeRetMessage(ret_message, req_message->req_id, req_message->count);
 
       /* send message */
-
+      printf("%ld\n",ret_message[0]->payload[0]);
       convertRet(ret_message, (int)(req_message->count/25+1), 1);
 
       ret_packet_t ret_message_cpy[sizeof(req_message->count/25+1)];
       for (int i=0; i<(req_message->count/25+1); i++) {
 	      ret_message_cpy[i]=*ret_message[i];
+	      for(int j=0; j<25; j++) {
+		      int payload=ret_message[i]->payload[j];
+		      ret_message_cpy[i].payload[j]=payload;
+	      }
       }
-
-      for (int i=0; i< 25; i++) {
-              printf("i: %d, randint: %d\n", i, ret_message_cpy[0].payload[i]);
-      }
-
 
       bytes_sent = sendto(sock_server, ret_message_cpy, sizeof(ret_message), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
