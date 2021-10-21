@@ -6,6 +6,7 @@ void makeRetPacket(ret_packet_t new_packet, unsigned short req_id,
 	 *
 	 */
 	printf("Beginning makeRetPacket...\n");
+	printf("req_id: %hu\n", req_id);
 	new_packet.req_id=req_id;
 	new_packet.seq_num=seq_num;
 	new_packet.last=last;
@@ -34,7 +35,14 @@ void makeRetMessage(ret_packet_t *return_message, unsigned short req_id, unsigne
 			last = 1;
 			count_arg=remaining_count;
 		}
-		makeRetPacket(return_message[i], req_id, i, last, count_arg);
+		printf("makes it here\n");
+		return_message[i].req_id=req_id;
+        	return_message[i].seq_num=i;
+        	return_message[i].last=last;
+        	return_message[i].count=count_arg;
+        	for (int j=0; i<count; j++) {
+                	return_message[i].payload[j]=(unsigned long int)rand()%65536;
+        	}
 		i++;
 	}
 	printf("Leaving makeRetMessage...\n");
