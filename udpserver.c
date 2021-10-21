@@ -85,6 +85,7 @@ int main(void) {
 	      ret_message_cpy[i]=*ret_message[i];
 	      for(int j=0; j<25; j++) {
 		      int payload=ret_message[i]->payload[j];
+		      printf("payload: %d\n", payload);
 		      ret_message_cpy[i].payload[j]=payload;
 	      }
       }
