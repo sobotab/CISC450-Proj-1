@@ -21,11 +21,12 @@ int main(void) {
    int bytes_sent, total_bytes_sent=0, total_bytes_recd=0, bytes_recd; /* number of bytes sent or received */
    unsigned short int i=1;
    int keepGoing=1;
-   int correctInput=0;
+   int correctInput=1;
    int packet_count=0;
    int total_packets=0;
    unsigned short int seq_sum=0;
    unsigned int check_sum=0;
+   char input[STRING_SIZE];
 
    /* open a socket */
 
@@ -93,14 +94,15 @@ int main(void) {
    /* user interface */
    for(;keepGoing;) {
    	printf("Please input size of payload:\n");
-   	do {
-	        scanf("%hu", &count);
-		if (count<65535 && count>1 && !isdigit(count)) {
-			correctInput=1;
+   	while(correctInput) {
+		scanf("%s", input);
+		if (count<65535 && count>1 && !isdigit(input)) {
+			correctInput=0;
+			count=atoi(input);
 		}else {
 			printf("Make sure your input is a number between 1-65535\n");
 		}
-	} while(!correctInput);
+	}
 	correctInput=0;
 	if (count%25==0) {
 		packet_count=count/25;
