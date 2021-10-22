@@ -21,6 +21,7 @@ int main(void) {
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
    unsigned short int i=1;
    int keepGoing=1;
+   int packet_count;
    /* open a socket */
 
    if ((sock_client = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
@@ -97,6 +98,11 @@ int main(void) {
 		}
 	} while(!correctInput);
 	correctInput=0;
+	if (count%25==0) {
+		packet_count=count/25;
+	} else {
+		packet_count=count/25+1;
+	}
    	/* send message */
   	req_packet_t *req_packet=malloc(sizeof(req_packet));
 	req_packet=makeReqPacket(i,count);
@@ -106,9 +112,9 @@ int main(void) {
    	
 	
 	/* get response from server*/
-	ret_message=(ret_packet_t *)malloc(sizeof(ret_packet_t)*(count/25+1));
+	ret_message=(ret_packet_t *)malloc(sizeof(ret_packet_t)*packet_count);
    	printf("Waiting for response from server...\n");
-   	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*(count/25+1), 0,
+   	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*packet_count, 0,
        		(struct sockaddr *) 0, (int *) 0);
 	
 	
@@ -119,7 +125,7 @@ int main(void) {
               }
         }*/
 
-	convertRet(ret_message, count/25+1, 0);
+	convertRet(ret_message, packet_count, 0);
 	
 	/*for(int i=0; i<count/25+1; i++) {
               printf("req_id: %hu, seq_num: %hu, last: %hu, count: %hu payload: \n", ret_message[i].req_id, ret_message[i].seq_num, ret_message[i].last, ret_message[i].count);

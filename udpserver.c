@@ -18,9 +18,10 @@ int main(void) {
 
    req_packet_t *req_message=(req_packet_t*)malloc(sizeof(req_packet_t)+1);  /* receive message */
    ret_packet_t **ret_message; /* return message */
-   unsigned int msg_len;  /* length of message */
-   int bytes_sent, bytes_recd; /* number of bytes sent or received */
-   unsigned int i;  /* temporary loop variable */
+   int bytes_sent=0, bytes_recd=0; /* number of bytes sent or received */
+   int total_packets;
+   int packets;
+   int packet_count;
 
    /* open a socket */
 
@@ -56,41 +57,42 @@ int main(void) {
    client_addr_len = sizeof (client_addr);
 
    for (;;) {
-
-      bytes_recd = recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
+      printf("\nWaiting for incoming message...\n");
+      bytes_recd += recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
-      printf("Before convert req_message\n");
       convertReq(req_message, 0);
-      printf("Received Sentence is: %s\n     with length %d\n\n",
-                         "message", bytes_recd);
+      if(req_message->count%25==0) {
+	      packet_count=req_message->count/25;
+      } else {
+	      packet_count=req_message->count/25+1;
+      }
 
       /* prepare the message to send */
-
-      msg_len = bytes_recd;
-      ret_packet_t ret_message[req_message->count/25+1];
-
+      ret_packet_t ret_message[packet_count];
       makeRetMessage(ret_message, req_message->req_id, req_message->count);
 	
-      printf("ret_message: \n");
+      /*printf("ret_message: \n");
       for(int i=0; i<req_message->count/25+1; i++) {
 	      printf("req_id: %hu, seq_num: %hu, last: %hu, count: %hu payload: \n", ret_message[i].req_id, ret_message[i].seq_num, ret_message[i].last, ret_message[i].count);
 	      for (int j=0; j<25; j++) {
 		      printf("\tindex: %d, value: %ld\n", j, ret_message[i].payload[j]);
 	      }
-      }
+      }*/
 
       /* send message */
-      convertRet(ret_message, (int)(req_message->count/25+1), 1);
+      convertRet(ret_message, packet_count, 1);
 	
-      for(int i=0; i<req_message->count/25+1; i++) {
+      /*for(int i=0; i<req_message->count/25+1; i++) {
               printf("req_id: %hu, seq_num: %hu, last: %hu, count: %hu payload: \n", ret_message[i].req_id, ret_message[i].seq_num, ret_message[i].last, ret_message[i].count);
               for (int j=0; j<25; j++) {
                       printf("\tindex: %d, value: %ld\n", j, ret_message[i].payload[j]);
               }
-      }
+      }*/
 
-      bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t)*(req_message->count/25+1), 0,
+      bytes_sent += sendto(sock_server, ret_message, sizeof(ret_packet_t)*packet_count, 0,
                (struct sockaddr*) &client_addr, client_addr_len);
-   	printf("after bytes sent\n");
+
+      /*Print info from packets received/sent*/
+
    }
  }
