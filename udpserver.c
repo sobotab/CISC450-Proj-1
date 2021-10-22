@@ -18,10 +18,11 @@ int main(void) {
 
    req_packet_t *req_message=(req_packet_t*)malloc(sizeof(req_packet_t)+1);  /* receive message */
    ret_packet_t **ret_message; /* return message */
-   int bytes_sent=0, bytes_recd=0; /* number of bytes sent or received */
-   int total_packets;
-   int packets;
+   int bytes_sent=0, total_bytes_sent=0, total_bytes_recd=0, bytes_recd=0; /* number of bytes sent or received */
+   int total_packets=0;
    int packet_count;
+   unsigned short int seq_sum=0;
+   unsigned int check_sum=0;
 
    /* open a socket */
 
@@ -58,7 +59,7 @@ int main(void) {
 
    for (;;) {
       printf("\nWaiting for incoming message...\n");
-      bytes_recd += recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
+      bytes_recd = recvfrom(sock_server, req_message, sizeof(req_message)+1, 0,
                      (struct sockaddr *) &client_addr, &client_addr_len);
       convertReq(req_message, 0);
       if(req_message->count%25==0) {
@@ -80,6 +81,12 @@ int main(void) {
       }*/
 
       /* send message */
+      for(int i=0; i<packet_count; i++) {
+	      seq_sum+=ret_message[i].seq_num;
+	      for(int j=0; j<25; j++) {
+		      check_sum+=ret_message[i].payload[j];
+	      }
+      }
       convertRet(ret_message, packet_count, 1);
 	
       /*for(int i=0; i<req_message->count/25+1; i++) {
@@ -89,10 +96,19 @@ int main(void) {
               }
       }*/
 
-      bytes_sent += sendto(sock_server, ret_message, sizeof(ret_packet_t)*packet_count, 0,
+      bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t)*packet_count, 0,
                (struct sockaddr*) &client_addr, client_addr_len);
 
       /*Print info from packets received/sent*/
-
+      total_packets+=packet_count;
+      total_bytes_sent+=bytes_sent;
+      printf("Message received: ");
+      printf("Request ID: %hu\tCount: %hu\n", req_message->req_id, req_message->count);
+      printf("\tNo. of Response Packets:\n\tThis Time: %d\tTotal: %d\n",packet_count, total_packets);
+      printf("\tNo. of Bytes Transmitted:\n\tThis Time: %d\tTotal: %d\n",bytes_sent, total_bytes_sent);
+      printf("\tSum of All Packet Sequence Numbers: %hu\n", seq_sum);
+      seq_sum=0;
+      printf("\tChecksum of Entire Payload: %d\n", check_sum);
+      check_sum=0;
    }
  }

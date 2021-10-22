@@ -28,10 +28,10 @@ void makeRetMessage(ret_packet_t *return_message, unsigned short req_id, unsigne
 	int i=0;
 	while (!last && remaining_count) {
 		if(remaining_count > 25) {
-			printf("making packet of size 25\n");
+			//printf("making packet of size 25\n");
 			remaining_count=remaining_count-count_arg;
 		} else {
-			printf("making packet of size <25\n");
+			//printf("making packet of size <25\n");
 			last = 1;
 			count_arg=remaining_count;
 		}

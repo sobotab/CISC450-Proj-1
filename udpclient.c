@@ -18,10 +18,15 @@ int main(void) {
    short unsigned count;  /* send message */
    ret_packet_t *ret_message; /* receive message */
    unsigned int msg_len;  /* length of message */
-   int bytes_sent, bytes_recd; /* number of bytes sent or received */
+   int bytes_sent, total_bytes_sent=0, total_bytes_recd=0, bytes_recd; /* number of bytes sent or received */
    unsigned short int i=1;
    int keepGoing=1;
-   int packet_count;
+   int correctInput=0;
+   int packet_count=0;
+   int total_packets=0;
+   unsigned short int seq_sum=0;
+   unsigned int check_sum=0;
+
    /* open a socket */
 
    if ((sock_client = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
@@ -68,7 +73,6 @@ int main(void) {
    /* end of local address initialization and binding */
 
    /* initialize server address information */
-   int correctInput=0;
    printf("Enter hostname of server: ");
    scanf("%s", server_hostname);
    if ((server_hp = gethostbyname(server_hostname)) == NULL) {
@@ -133,6 +137,25 @@ int main(void) {
                       printf("\tindex: %d, value: %ld\n", j, ret_message[i].payload[j]);
               }
         }*/
+	/*Print info*/
+	total_packets+=packet_count;
+	total_bytes_recd+=bytes_recd;
+	for(int i=0; i<packet_count; i++) {
+              seq_sum+=ret_message[i].seq_num;
+              for(int j=0; j<25; j++) {
+                      check_sum+=ret_message[i].payload[j];
+              }
+        }
+
+	printf("\nRequest ID: %hu\tCount: %hu\n", i, count);
+	printf("\tNo. of Response Packets:\n\tThis Time: %d\tTotal: %d\n",packet_count, total_packets);
+	printf("\tNo. of Bytes Received:\n\tThis Time: %d\tTotal: %d\n",bytes_recd, total_bytes_recd);
+        printf("\tSum of All Packet Sequence Numbers: %hu\n", seq_sum);
+        seq_sum=0;
+        printf("\tChecksum of Entire Payload: %d\n\n", check_sum);
+        check_sum=0;
+
+
 	free(ret_message);
 	i++;
 
