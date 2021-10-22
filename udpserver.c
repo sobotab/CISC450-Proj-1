@@ -89,7 +89,7 @@ int main(void) {
               }
       }
 
-      bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t)*req_message->count/25+1, 0,
+      bytes_sent = sendto(sock_server, ret_message, sizeof(ret_packet_t)*(req_message->count/25+1), 0,
                (struct sockaddr*) &client_addr, client_addr_len);
    	printf("after bytes sent\n");
    }

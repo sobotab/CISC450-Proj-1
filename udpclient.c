@@ -19,7 +19,8 @@ int main(void) {
    ret_packet_t *ret_message; /* receive message */
    unsigned int msg_len;  /* length of message */
    int bytes_sent, bytes_recd; /* number of bytes sent or received */
-  
+   unsigned short int i=1;
+   int keepGoing=1;
    /* open a socket */
 
    if ((sock_client = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
@@ -66,7 +67,7 @@ int main(void) {
    /* end of local address initialization and binding */
 
    /* initialize server address information */
-
+   int correctInput=0;
    printf("Enter hostname of server: ");
    scanf("%s", server_hostname);
    if ((server_hp = gethostbyname(server_hostname)) == NULL) {
@@ -85,38 +86,60 @@ int main(void) {
    server_addr.sin_port = htons(server_port);
 
    /* user interface */
-   for(;;) {
-   	printf("Please input a sentence:\n");
-   	scanf("%hu", &count);
-
+   for(;keepGoing;) {
+   	printf("Please input size of payload:\n");
+   	do {
+	        scanf("%hu", &count);
+		if (count<65535 && count>1 && !isdigit(count)) {
+			correctInput=1;
+		}else {
+			printf("Make sure your input is a number between 1-65535\n");
+		}
+	} while(!correctInput);
+	correctInput=0;
    	/* send message */
   	req_packet_t *req_packet=malloc(sizeof(req_packet));
-	req_packet=makeReqPacket(1,count);
+	req_packet=makeReqPacket(i,count);
 	convertReq(req_packet, 1);
    	bytes_sent = sendto(sock_client, req_packet, sizeof(req_packet_t), 0,
          	   (struct sockaddr *) &server_addr, sizeof (server_addr));
-   	/* get response from server */
-	msg_len=sizeof(ret_packet_t) * count;
+   	
 	
+	/* get response from server*/
 	ret_message=(ret_packet_t *)malloc(sizeof(ret_packet_t)*(count/25+1));
-  
    	printf("Waiting for response from server...\n");
-   	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*sizeof(ret_packet_t), 0,
-       		(struct sockaddr *) 0, (int *) 0); 
-	for (int i=0; i<25; i++) {
-                printf("i: %d, randint: %ld\n", i, ret_message[0].payload[i]);
-        }
+   	bytes_recd = recvfrom(sock_client, ret_message, sizeof(ret_packet_t)*(count/25+1), 0,
+       		(struct sockaddr *) 0, (int *) 0);
+	
+	
+	/*for(int i=0; i<count/25+1; i++) {
+              printf("req_id: %hu, seq_num: %hu, last: %hu, count: %hu payload: \n", ret_message[i].req_id, ret_message[i].seq_num, ret_message[i].last, ret_message[i].count);
+              for (int j=0; j<25; j++) {
+                      printf("\tindex: %d, value: %ld\n", j, ret_message[i].payload[j]);
+              }
+        }*/
 
 	convertRet(ret_message, count/25+1, 0);
-   	printf("Made it here?\n");
 	
-	for (int i=0; i<25; i++) {
-		printf("i: %d, randint: %ld\n", i, ret_message[0].payload[i]);
-	}
-	printf("seq_num: %hu, req_id: %hu, count: %hu: last: %hu\n", ret_message[0].seq_num, ret_message[0].req_id, ret_message[0].count, ret_message[0].last);
-
-
+	/*for(int i=0; i<count/25+1; i++) {
+              printf("req_id: %hu, seq_num: %hu, last: %hu, count: %hu payload: \n", ret_message[i].req_id, ret_message[i].seq_num, ret_message[i].last, ret_message[i].count);
+              for (int j=0; j<25; j++) {
+                      printf("\tindex: %d, value: %ld\n", j, ret_message[i].payload[j]);
+              }
+        }*/
 	free(ret_message);
+	i++;
+
+	printf("Type 1 and send another packet OR type 0 and enter to exit: \n");
+	do {
+                scanf("%d", &keepGoing);
+                if (count<65535 && count>1 && !isdigit(count)) {
+                        correctInput=1;
+                }else {
+                        printf("Make sure your input is 1 or 0\n");
+                }
+        } while(!correctInput);
+
    }
    /* close the socket */
 
